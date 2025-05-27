@@ -44,11 +44,8 @@ class App extends React.Component {
         from: accounts[0],
         value: web3.utils.toWei(this.state.valueAmount, "ether"),
       });
-      this.setState({ isLoading: false });
     } catch (error) {
-      this.setState({ errorMessage: error.message });
-    } finally {
-      this.setState({ isLoading: false });
+      this.setState({ errorMessage: error.message, isLoading: false });
     }
   };
 
@@ -96,7 +93,7 @@ class App extends React.Component {
             {!this.state.isLoading ? (
               <button type="submit">Enter with custom amont </button>
             ) : (
-              "Loading...."
+              "Waiting for transaction to be mined..."
             )}
           </form>
         </body>
