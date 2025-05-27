@@ -9,6 +9,9 @@ class App extends React.Component {
     manager: "",
     players: [],
     balance: "",
+    valueAmount: 0.01,
+    errorMessage: "",
+    isLoading: false,
   };
 
   async getManager() {
@@ -31,6 +34,12 @@ class App extends React.Component {
   componentDidMount() {
     this.getManager();
   }
+
+  onSubmit = async (event) => {
+    event.preventDefault();
+    this.setState({ isLoading: true, errorMessage: "" });
+  };
+
   render() {
     // console.log(web3);
     // web3.eth.getAccounts().then(console.log);
@@ -49,6 +58,35 @@ class App extends React.Component {
             ether
           </p>
         </header>
+
+        <hr />
+
+        <body>
+          <h2>Want to try luck ? </h2>
+          <p>
+            Each entry costs 0.01 ether.
+            <button>Enter</button>
+          </p>
+          <div> or precise the amount</div>
+          <form onSubmit={this.onSubmit}>
+            <input
+              type="number"
+              min="0.00"
+              max="10000.00"
+              step="0.01"
+              placeholder="0.01"
+              onChange={(e) => this.setState({ valueAmount: e.target.value })}
+            />
+            <br />
+            {!this.state.isLoading ? (
+              <button type="submit">Enter with custom amont </button>
+            ) : (
+              "Loading...."
+            )}
+          </form>
+        </body>
+
+        <hr />
       </div>
     );
   }
