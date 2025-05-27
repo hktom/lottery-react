@@ -37,7 +37,19 @@ class App extends React.Component {
 
   onSubmit = async (event) => {
     event.preventDefault();
-    this.setState({ isLoading: true, errorMessage: "" });
+    try {
+      this.setState({ isLoading: true, errorMessage: "" });
+      const accounts = await web3.eth.getAccounts();
+      await lotteryContract.methods.enter().send({
+        from: accounts[0],
+        value: web3.utils.toWei(this.state.valueAmount, "ether"),
+      });
+      this.setState({ isLoading: false });
+    } catch (error) {
+      this.setState({ errorMessage: error.message });
+    } finally {
+      this.setState({ isLoading: false });
+    }
   };
 
   render() {
@@ -68,6 +80,9 @@ class App extends React.Component {
             <button>Enter</button>
           </p>
           <div> or precise the amount</div>
+          {this.state.errorMessage && (
+            <div style={{ color: "red" }}>{this.state.errorMessage}</div>
+          )}
           <form onSubmit={this.onSubmit}>
             <input
               type="number"
