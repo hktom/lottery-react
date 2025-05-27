@@ -12,6 +12,8 @@ class App extends React.Component {
     valueAmount: 0.01,
     errorMessage: "",
     isLoading: false,
+    winner: "",
+    waitingMessage: "",
   };
 
   async getManager() {
@@ -38,15 +40,39 @@ class App extends React.Component {
   onSubmit = async (event) => {
     event.preventDefault();
     try {
-      this.setState({ isLoading: true, errorMessage: "" });
+      this.setState({
+        isLoading: true,
+        errorMessage: "",
+        waitingMessage: "Waiting for transaction to be mined...",
+      });
       const accounts = await web3.eth.getAccounts();
       await lotteryContract.methods.enter().send({
         from: accounts[0],
         value: web3.utils.toWei(this.state.valueAmount, "ether"),
       });
     } catch (error) {
-      this.setState({ errorMessage: error.message, isLoading: false });
+      this.setState({
+        errorMessage: error.message,
+        isLoading: false,
+        waitingMessage: "",
+      });
     }
+  };
+
+  pickWinner = async () => {
+    this.setState({
+      waitingMessage: "Waiting for transaction to be mined...",
+    });
+    const accounts = await web3.eth.getAccounts();
+    await lotteryContract.methods.pickWinner().send({
+      from: accounts[0],
+    });
+    this.setState({ winner: accounts[0] });
+
+    this.setState({
+      isLoading: false,
+      waitingMessage: `The winner has been picked 🎉 ${accounts[0]}`,
+    });
   };
 
   render() {
@@ -99,6 +125,15 @@ class App extends React.Component {
         </body>
 
         <hr />
+
+        <h2> Ready to pick a winner </h2>
+        {!this.state.winner ? (
+          <button onClick={this.pickWinner}>Pick a winner</button>
+        ) : (
+          <p>The winner is {this.state.winner} 🥳</p>
+        )}
+
+        <i>{this.state.waitingMessage}</i>
       </div>
     );
   }
